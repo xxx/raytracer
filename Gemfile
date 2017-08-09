@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'rmagick'
+gem 'colorable'
 
 gem 'byebug'
 gem 'pry'

@@ -21,6 +21,11 @@ Material = Struct.new(:color, :albedo) do
 end
 
 Ray = Struct.new(:origin, :direction)
+# Directional Light
+#
+# @param [Vector] direction
+# @param [String] color - Any color handled by ImageMagick
+# @param [Float] intensity - 0.0 (no light) - (anything)
 DirectionalLight = Struct.new(:direction, :color, :intensity)
 
 # Scene Model
@@ -30,7 +35,7 @@ class Scene
 
   attr_reader :models
 
-  def initialize(models, width: 512, height: 512, fov: 90, background_color: 'black')
+  def initialize(models, width: 512, height: 512, fov: 90, background_color: 'black', light: nil)
     @models = models
     @width = width
     @height = height
@@ -45,6 +50,7 @@ class Scene
     @canvas = Magick::Image.new(width, height) do |img|
       img.background_color = background_color
     end
+    @light = light
   end
 
   def render(progress_bar: false)
@@ -80,7 +86,19 @@ class Scene
         end.first
 
         if closest
-          draw.fill(closest[0].material.color)
+          if @light
+            hit_point = ray.origin + (ray.direction * closest[1])
+            surface_normal = closest[0].surface_normal(hit_point)
+            direction_to_light = -@light.direction
+            light_power = surface_normal.dot(direction_to_light) * @light.intensity
+            light_power = 0.0 if light_power.negative?
+            light_reflected = closest[0].material.albedo / Math::PI
+            multiplied_color = Colorable::Color.new(closest[0].material.color) * Colorable::Color.new(@light.color)
+            new_color = Colorable::Color.new(multiplied_color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min })
+            draw.fill(new_color.hex)
+          else
+            draw.fill(closest[0].material.color)
+          end
           draw.point(x, y)
         end
 
@@ -89,6 +107,22 @@ class Scene
     end
 
     draw.draw(@canvas)
+  end
+
+  private
+
+  def multiply_colors(color1, color2)
+    bytes1 = [color1.sub('#', '')].pack('H*').bytes
+    bytes2 = [color2.sub('#', '')].pack('H*').bytes
+    normalized1 = bytes1.map { |byte| byte / 255.0 }
+    normalized2 = bytes2.map { |byte| byte / 255.0 }
+    multiplied = normalized1.each_with_index.with_object([]) do |(byte, idx), ob|
+      ob.push byte * normalized2[idx]
+    end
+
+    denormalized = multiplied.map { |m| m * 255.0 }
+    bytes3 = denormalized.pack('C*')
+
   end
 end
 
@@ -176,12 +210,18 @@ class Plane
 end
 
 models = [
-  Sphere.new(Point[0.5, -0.5, -3.0], 1.0, Material.new('#00ff0033')),
-  Sphere.new(Point[-1.0, 0.3, -1.2], 0.2, Material.new('#ffff0077', 0.4)),
-  Plane.new(Point[0.0, -2.0, -5.0], Vector[0.0, -1.0, 0.0], Material.new('#ff00ff44')),
-  # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], Material.new('#ff00ff44')),
+  Sphere.new(Point[0.5, -0.5, -3.0], 1.0, Material.new('#00ff00', 0.6)),
+  Sphere.new(Point[-1.0, 0.3, -1.2], 0.2, Material.new('#ffff00', 0.7)),
+  Plane.new(Point[0.0, -2.0, -5.0], Vector[0.0, -1.0, 0.0], Material.new('#ff00ff')),
+  # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], Material.new('ff00ff')),
 ]
-scene = Scene.new(models, width: 100, height: 100, background_color: '#555555')
+light = DirectionalLight.new(
+  Vector[0.0, 0.0, -1.0],
+  '#ffffff',
+  2.0
+)
+# light = nil
+scene = Scene.new(models, width: 100, height: 100, background_color: '#555555', light: light)
 scene.render(progress_bar: false)
 # binding.pry
 scene.display
