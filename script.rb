@@ -7,7 +7,6 @@ Bundler.require
 require 'matrix'
 
 Point = Vector
-Direction = Vector
 
 Material = Struct.new(:color)
 Ray = Struct.new(:origin, :direction)
@@ -19,7 +18,8 @@ class Scene
   def_delegators :@canvas, :display, :write
 
   attr_reader :models
-  def initialize(models, width: 512, height: 512, fov: 90)
+
+  def initialize(models, width: 512, height: 512, fov: 90, background_color: 'black')
     @models = models
     @width = width
     @height = height
@@ -32,7 +32,7 @@ class Scene
     @fov_radians = (fov.to_f * Math::PI) / 180.0
     @fov_adjustment = Math.tan(@fov_radians / 2.0)
     @canvas = Magick::Image.new(width, height) do |img|
-      img.background_color = 'black'
+      img.background_color = background_color
     end
   end
 
@@ -50,10 +50,18 @@ class Scene
         else
           ray_y *= @aspect_ratio
         end
-        ray = Ray.new(Point[0.0, 0.0, 0.0], Direction[ray_x, ray_y, -1.0].normalize)
+        ray = Ray.new(Point[0.0, 0.0, 0.0], Vector[ray_x, ray_y, -1.0].normalize)
 
-        if @models[0].intersects_with?(ray)
-          draw.fill(@models[0].material)
+        closest = @models.map do |model|
+          [model, model.intersection_with(ray)]
+        end.delete_if do |i|
+          i[1].nil?
+        end.sort_by do |x|
+          x[1]
+        end.first
+
+        if closest
+          draw.fill(closest[0].material)
           draw.point(x, y)
         end
       end
@@ -83,19 +91,30 @@ class Sphere
   # Where do I intersect with the given ray?
   #
   # @param [Ray] - the ray to check against
-  # @return [Point] - nearest point of intersection
+  # @return [Float] - distance of nearest point of intersection
   # @return [nil] - no intersection
-  def intersects_with?(ray)
+  def intersection_with(ray)
     hyp = origin - ray.origin
     adj = hyp.dot(ray.direction)
     opp = hyp.dot(hyp) - adj**2
-    opp < @radius**2
+    radius2 = @radius**2
+    return nil if opp > radius2 # no intersection
+
+    # Now we check a second triangle to get the location of the intersection
+    side3 = Math.sqrt(radius2 - opp)
+    t0 = adj - side3
+    t1 = adj + side3
+
+    return nil if t0.negative? && t1.negative?
+
+    t0 < t1 ? t0 : t1
   end
 end
 
 models = [
-  Sphere.new(Point[0.0, 0.0, -2.0], 1.0, '#00ff0033')
+  Sphere.new(Point[0.5, -0.5, -3.0], 1.0, '#00ff0033'),
+  Sphere.new(Point[-1.0, 0.3, -1.2], 0.2, '#ffff0077')
 ]
-scene = Scene.new(models, width: 666)
+scene = Scene.new(models, width: 666, background_color: '#555555')
 scene.render
 scene.display
