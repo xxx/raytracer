@@ -36,11 +36,10 @@ class Sphere
   end
 end
 
-width = 512
+width = 1024
 height = 512
 fov = 90
-raise 'eh' unless width >= height
-aspect_ratio = width.to_f / height.to_f
+aspect_ratio = width > height ? (width.to_f / height.to_f) : (height.to_f / width.to_f)
 fov_radians = (fov.to_f * Math::PI) / 180.0
 fov_adjustment = Math.tan(fov_radians / 2.0)
 
@@ -57,8 +56,13 @@ draw.fill('yellow')
 height.times do |y|
   width.times do |x|
     # send ray through center of pixel, then normalize to (-1.0..1.0)
-    ray_x = ((((x + 0.5) / width) * 2.0 - 1.0) * aspect_ratio) * fov_adjustment
+    ray_x = (((x + 0.5) / width) * 2.0 - 1.0) * fov_adjustment
     ray_y = (1.0 - ((y + 0.5) / height) * 2.0) * fov_adjustment
+    if width > height
+      ray_x *= aspect_ratio
+    else
+      ray_y *= aspect_ratio
+    end
     ray = Ray.new(Point[0.0, 0.0, 0.0], Direction[ray_x, ray_y, -1.0].normalize)
     if sphere.intersects_with?(ray)
       draw.point(x, y)
