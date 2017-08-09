@@ -9,9 +9,17 @@ require 'matrix'
 # For readability
 Point = Vector
 
-Material = Struct.new(:color)
+# @param [String] color
+# @param [Float] albedo - how much ambient light is reflected
+Material = Struct.new(:color, :albedo) do
+  def initialize(*)
+    super
+    self.albedo ||= 1.0 # Default to reflecting 100% of light
+  end
+end
+
 Ray = Struct.new(:origin, :direction)
-Light = Struct.new(:origin, :color)
+DirectionalLight = Struct.new(:direction, :color, :intensity)
 
 # Scene Model
 class Scene
@@ -70,7 +78,7 @@ class Scene
         end.first
 
         if closest
-          draw.fill(closest[0].material)
+          draw.fill(closest[0].material.color)
           draw.point(x, y)
         end
 
@@ -93,7 +101,7 @@ class Sphere
   # @param material [Material] - Anything that ImageMagick can handle.
   #   See http://www.simplesystems.org/RMagick/doc/draw.html#fill
   # @return [Sphere]
-  def initialize(origin, radius, material = 'white')
+  def initialize(origin, radius, material = Material.new('white'))
     @origin = origin
     @radius = radius
     @material = material
@@ -105,7 +113,7 @@ class Sphere
   # @return [Float] - distance of nearest point of intersection
   # @return [nil] - no intersection
   def intersection_with(ray)
-    hyp = origin - ray.origin
+    hyp = @origin - ray.origin
     adj = hyp.dot(ray.direction)
     opp = hyp.dot(hyp) - adj**2
     radius2 = @radius**2
@@ -120,6 +128,10 @@ class Sphere
 
     t0 < t1 ? t0 : t1
   end
+
+  def surface_normal(intersect_point)
+    (intersect_point - @origin).normalize
+  end
 end
 
 # Plane model
@@ -133,7 +145,7 @@ class Plane
   # @param material [Material] - Anything that ImageMagick can handle.
   #   See http://www.simplesystems.org/RMagick/doc/draw.html#fill
   # @return [Plane]
-  def initialize(origin, normal, material = 'white')
+  def initialize(origin, normal, material = Material.new('white'))
     @origin = origin
     @normal = normal
     @material = material
@@ -145,23 +157,27 @@ class Plane
   # @return [Float] - distance of nearest point of intersection
   # @return [nil] - no intersection
   def intersection_with(ray)
-    denom = normal.dot(ray.direction)
+    denom = @normal.dot(ray.direction)
 
     # if this is zero, ray and plane are parallel
     return nil if denom < 1e-3 # account for floating point errors
 
     v = @origin - ray.origin
-    distance = v.dot(normal) / denom
+    distance = v.dot(@normal) / denom
     return distance if distance.positive?
     nil
+  end
+
+  def surface_normal(_intersect_point)
+    -@normal
   end
 end
 
 models = [
-  Sphere.new(Point[0.5, -0.5, -3.0], 1.0, '#00ff0033'),
-  Sphere.new(Point[-1.0, 0.3, -1.2], 0.2, '#ffff0077'),
-  Plane.new(Point[0.0, -2.0, -5.0], Vector[0.0, -1.0, 0.0], '#ff00ff44'),
-  # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], '#ff00ff44'),
+  Sphere.new(Point[0.5, -0.5, -3.0], 1.0, Material.new('#00ff0033')),
+  Sphere.new(Point[-1.0, 0.3, -1.2], 0.2, Material.new('#ffff0077', 0.4)),
+  Plane.new(Point[0.0, -2.0, -5.0], Vector[0.0, -1.0, 0.0], Material.new('#ff00ff44')),
+  # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], Material.new('#ff00ff44')),
 ]
 scene = Scene.new(models, width: 100, height: 100, background_color: '#555555')
 scene.render(progress_bar: false)
