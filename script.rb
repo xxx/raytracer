@@ -9,7 +9,9 @@ require 'matrix'
 # For readability
 Point = Vector
 
-# @param [String] color
+# Model materials
+#
+# @param [String] color - Any color handled by ImageMagick
 # @param [Float] albedo - how much ambient light is reflected
 Material = Struct.new(:color, :albedo) do
   def initialize(*)
@@ -183,3 +185,4 @@ scene = Scene.new(models, width: 100, height: 100, background_color: '#555555')
 scene.render(progress_bar: false)
 # binding.pry
 scene.display
+# scene.write('hello.png')
