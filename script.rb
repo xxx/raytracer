@@ -13,6 +13,7 @@ Material = Struct.new(:color)
 Ray = Struct.new(:origin, :direction)
 Light = Struct.new(:origin, :color)
 
+# Sphere model
 class Sphere
   attr_reader :origin, :radius, :material
 
@@ -39,7 +40,11 @@ end
 width = 1024
 height = 512
 fov = 90
-aspect_ratio = width > height ? (width.to_f / height.to_f) : (height.to_f / width.to_f)
+aspect_ratio = if width > height
+                 width.to_f / height.to_f
+               else
+                 height.to_f / width.to_f
+               end
 fov_radians = (fov.to_f * Math::PI) / 180.0
 fov_adjustment = Math.tan(fov_radians / 2.0)
 
@@ -64,10 +69,7 @@ height.times do |y|
       ray_y *= aspect_ratio
     end
     ray = Ray.new(Point[0.0, 0.0, 0.0], Direction[ray_x, ray_y, -1.0].normalize)
-    if sphere.intersects_with?(ray)
-      draw.point(x, y)
-    end
-
+    draw.point(x, y) if sphere.intersects_with?(ray)
   end
 end
 
