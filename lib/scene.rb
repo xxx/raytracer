@@ -1,6 +1,8 @@
 # Scene Model
 
 class Scene
+  SHADOW_BIAS = 1e-13
+
   extend Forwardable
   def_delegators :@canvas, :display, :write
 
@@ -48,20 +50,19 @@ class Scene
         end
         ray = Ray.new(Point[0.0, 0.0, 0.0], Vector[ray_x, ray_y, -1.0].normalize)
 
-        closest = @models.map do |model|
-          [model, model.intersection_with(ray)]
-        end.delete_if do |i|
-          i[1].nil?
-        end.sort_by do |x|
-          x[1]
-        end.first
+        closest = closest_intersection_of(ray)
 
         if closest
           if @light
             hit_point = ray.origin + (ray.direction * closest[1])
             surface_normal = closest[0].surface_normal(hit_point)
             direction_to_light = -@light.direction
-            light_power = surface_normal.dot(direction_to_light) * @light.intensity
+
+            shadow_ray = Ray.new(hit_point + (surface_normal * SHADOW_BIAS), direction_to_light)
+            lit = closest_intersection_of(shadow_ray).nil?
+
+            light_intensity = lit ? @light.intensity : 0.0
+            light_power = surface_normal.dot(direction_to_light) * light_intensity
             light_power = 0.0 if light_power.negative?
             light_reflected = closest[0].material.albedo / Math::PI
             multiplied_color = Colorable::Color.new(closest[0].material.color) * Colorable::Color.new(@light.color)
@@ -81,6 +82,16 @@ class Scene
   end
 
   private
+
+  def closest_intersection_of(ray)
+    @models.map do |model|
+      [model, model.intersection_with(ray)]
+    end.delete_if do |i|
+      i[1].nil?
+    end.sort_by do |x|
+      x[1]
+    end.first
+  end
 
   def multiply_colors(color1, color2)
     bytes1 = [color1.sub('#', '')].pack('H*').bytes

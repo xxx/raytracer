@@ -18,7 +18,7 @@ models = [
   # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], Material.new('ff00ff')),
 ]
 light = DirectionalLight.new(
-  Vector[0.0, 0.0, -1.0],
+  Vector[0.0, -0.5, -1.0],
   '#ffffff',
   2.0
 )
