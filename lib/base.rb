@@ -8,6 +8,7 @@ Point = Vector
 Material = Struct.new(:color, :albedo) do
   def initialize(*)
     super
+    self.color = Colorable::Color.new(color)
     self.albedo ||= 1.0 # Default to reflecting 100% of light
   end
 end
@@ -18,4 +19,9 @@ Ray = Struct.new(:origin, :direction)
 # @param [Vector] direction
 # @param [String] color - Any color handled by ImageMagick
 # @param [Float] intensity - 0.0 (no light) - (anything)
-DirectionalLight = Struct.new(:direction, :color, :intensity)
+DirectionalLight = Struct.new(:direction, :color, :intensity) do
+  def initialize(*)
+    super
+    self.color = Colorable::Color.new(color)
+  end
+end

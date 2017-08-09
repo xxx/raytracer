@@ -65,7 +65,7 @@ class Scene
             light_power = surface_normal.dot(direction_to_light) * light_intensity
             light_power = 0.0 if light_power.negative?
             light_reflected = closest[0].material.albedo / Math::PI
-            multiplied_color = Colorable::Color.new(closest[0].material.color) * Colorable::Color.new(@light.color)
+            multiplied_color = closest[0].material.color * @light.color
             new_color = Colorable::Color.new(multiplied_color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min })
             draw.fill(new_color.hex)
           else
