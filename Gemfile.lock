@@ -36,6 +36,7 @@ DEPENDENCIES
   pry
   rmagick
   rubocop
+  ruby-progressbar
 
 BUNDLED WITH
    1.15.3

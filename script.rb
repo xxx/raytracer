@@ -6,6 +6,7 @@ require 'bundler'
 Bundler.require
 require 'matrix'
 
+# For readability
 Point = Vector
 
 Material = Struct.new(:color)
@@ -36,8 +37,16 @@ class Scene
     end
   end
 
-  def render
+  def render(progress_bar: false)
     draw = Magick::Draw.new
+
+    bar = nil
+    if progress_bar
+      bar = ProgressBar.create(
+        total: @width * @height,
+        format: '%t: %c/%C %e |%w|'
+      )
+    end
 
     # :orthographic vs perspective
     @height.times do |y|
@@ -64,6 +73,8 @@ class Scene
           draw.fill(closest[0].material)
           draw.point(x, y)
         end
+
+        bar&.increment
       end
     end
 
@@ -111,10 +122,48 @@ class Sphere
   end
 end
 
+# Plane model
+class Plane
+  attr_reader :origin, :normal, :material
+
+  # Create a plane
+  #
+  # @param origin [Point]
+  # @param normal [Vector] - assumed to already be normalized
+  # @param material [Material] - Anything that ImageMagick can handle.
+  #   See http://www.simplesystems.org/RMagick/doc/draw.html#fill
+  # @return [Plane]
+  def initialize(origin, normal, material = 'white')
+    @origin = origin
+    @normal = normal
+    @material = material
+  end
+
+  # Where do I intersect with the given ray?
+  #
+  # @param [Ray] - the ray to check against
+  # @return [Float] - distance of nearest point of intersection
+  # @return [nil] - no intersection
+  def intersection_with(ray)
+    denom = normal.dot(ray.direction)
+
+    # if this is zero, ray and plane are parallel
+    return nil if denom < 1e-3 # account for floating point errors
+
+    v = @origin - ray.origin
+    distance = v.dot(normal) / denom
+    return distance if distance.positive?
+    nil
+  end
+end
+
 models = [
   Sphere.new(Point[0.5, -0.5, -3.0], 1.0, '#00ff0033'),
-  Sphere.new(Point[-1.0, 0.3, -1.2], 0.2, '#ffff0077')
+  Sphere.new(Point[-1.0, 0.3, -1.2], 0.2, '#ffff0077'),
+  Plane.new(Point[0.0, -2.0, -5.0], Vector[0.0, -1.0, 0.0], '#ff00ff44'),
+  # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], '#ff00ff44'),
 ]
-scene = Scene.new(models, width: 666, background_color: '#555555')
-scene.render
+scene = Scene.new(models, width: 100, height: 100, background_color: '#555555')
+scene.render(progress_bar: false)
+# binding.pry
 scene.display
