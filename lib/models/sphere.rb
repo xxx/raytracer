@@ -38,7 +38,14 @@ class Sphere
     t0 < t1 ? t0 : t1
   end
 
-  def surface_normal(intersect_point)
-    (intersect_point - @origin).normalize
+  def surface_normal(hit_point)
+    (hit_point - @origin).normalize
+  end
+
+  def texture_coordinates(hit_point)
+    hit_vec = hit_point - @origin
+    x = (1.0 + Math.atan2(hit_vec[2], hit_vec[0]) / Math::PI) * 0.5
+    y = Math.acos(hit_vec[1] - @radius) / Math::PI
+    Struct.new(:x, :y).new(x, y)
   end
 end

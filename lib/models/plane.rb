@@ -32,7 +32,17 @@ class Plane
     distance.positive? ? distance : nil
   end
 
-  def surface_normal(_intersect_point)
+  def surface_normal(_hit_point)
     -@normal
+  end
+
+  def texture_coordinates(hit_point)
+    x_axis = @normal.cross(Vector[0.0, 0.0, 1.0])
+    x_axis = @normal.cross(Vector[0.0, 1.0, 0.0]) if x_axis.magnitude.zero?
+    y_axis = @normal.cross(x_axis)
+    hit_vec = hit_point - @origin
+    x = hit_vec.dot(x_axis)
+    y = hit_vec.dot(y_axis)
+    Struct.new(:x, :y).new(x, y)
   end
 end
