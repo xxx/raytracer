@@ -8,7 +8,7 @@ class Scene
 
   attr_reader :models
 
-  def initialize(models, width: 512, height: 512, fov: 90, background_color: 'black', light: nil)
+  def initialize(models, width: 512, height: 512, fov: 90, background_color: 'black', lights: [])
     @models = models
     @width = width
     @height = height
@@ -23,7 +23,7 @@ class Scene
     @canvas = Magick::Image.new(width, height) do |img|
       img.background_color = background_color
     end
-    @light = light
+    @lights = lights
   end
 
   def render(progress_bar: false)
@@ -53,21 +53,31 @@ class Scene
         closest = closest_intersection_of(ray)
 
         if closest
-          if @light
+          if @lights.length.positive?
             hit_point = ray.origin + (ray.direction * closest[1])
             surface_normal = closest[0].surface_normal(hit_point)
-            direction_to_light = -@light.direction
+            fill_color = Colorable::Color.new('#000000')
 
-            shadow_ray = Ray.new(hit_point + (surface_normal * SHADOW_BIAS), direction_to_light)
-            lit = closest_intersection_of(shadow_ray).nil?
+            @lights.each do |light|
+              direction_to_light = light.direction_from(hit_point)
+              # use SHADOW_BIAS to correct shadow acne. can lead to peter panning, but better that than acne
+              shadow_ray = Ray.new(hit_point + (surface_normal * SHADOW_BIAS), direction_to_light.normalize)
+              shadow_intersection = closest_intersection_of(shadow_ray)
 
-            light_intensity = lit ? @light.intensity : 0.0
-            light_power = surface_normal.dot(direction_to_light) * light_intensity
-            light_power = 0.0 if light_power.negative?
-            light_reflected = closest[0].material.albedo / Math::PI
-            multiplied_color = closest[0].material.color * @light.color
-            new_color = Colorable::Color.new(multiplied_color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min })
-            draw.fill(new_color.hex)
+              lit = shadow_intersection.nil? || shadow_intersection[1] > light.distance_from(hit_point)
+              light_intensity = lit ? light.intensity_at(hit_point) : 0.0
+              light_power = surface_normal.dot(direction_to_light) * light_intensity
+              light_power = 0.0 if light_power.negative?
+              light_reflected = closest[0].material.albedo / Math::PI
+              light_color = Colorable::Color.new(
+                light.color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min }
+              )
+
+              # binding.pry
+              fill_color += light_color * closest[0].material.color
+            end
+
+            draw.fill(fill_color.hex)
           else
             draw.fill(closest[0].material.color)
           end

@@ -29,8 +29,7 @@ class Plane
 
     v = @origin - ray.origin
     distance = v.dot(@normal) / denom
-    return distance if distance.positive?
-    nil
+    distance.positive? ? distance : nil
   end
 
   def surface_normal(_intersect_point)
