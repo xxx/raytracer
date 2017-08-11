@@ -69,7 +69,7 @@ models = [
   Plane.new(
     Point[0.0, -2.0, -5.0],
     Vector[0.0, -1.0, 0.0],
-    Material.new(nil, 0.6, ImageTexture.new('img/ostrich.jpg'))
+    Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'))
   ),
   # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], Material.new('#ff0000', 0.38)),
 ]
@@ -79,11 +79,11 @@ lights = [
   #   '#ffffff',
   #   2.0
   # ),
-  DirectionalLight.new(
-    Vector[1.0, -1.5, -1.0],
-    '#ffffff',
-    3.0
-  ),
+  # DirectionalLight.new(
+  #   Vector[1.0, -1.5, -1.0],
+  #   '#ffffff',
+  #   3.0
+  # ),
   # DirectionalLight.new(
   #   Vector[-0.7, 0.0, -0.2],
   #   '#ffa500',

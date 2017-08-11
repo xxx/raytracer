@@ -54,15 +54,8 @@ class Scene
         closest = closest_intersection_of(ray)
 
         if closest
-          hit_point = ray.origin + (ray.direction * closest[1])
-          draw_color = diffuse_color(hit_point, closest)
-
-          # if material.reflectivity.positive?
-          #   reflection_ray = Ray.new(
-          #     hit_point + (surface_normal * SHADOW_BIAS),
-          #     ray.direction - (2.0 * ray.direction.dot(surface_normal) * surface_normal)
-          #   )
-          # end
+          model, distance = closest
+          draw_color = get_color(ray, model, distance)
 
           draw.fill(draw_color)
           draw.point(x, y)
@@ -77,12 +70,13 @@ class Scene
 
   private
 
-  def diffuse_color(hit_point, closest)
-    model, _distance = closest
+  def get_color(ray, model, distance)
+    hit_point = ray.origin + (ray.direction * distance)
+
     material = model.material
     surface_normal = model.surface_normal(hit_point)
 
-    if @lights.length.positive?
+    color = if @lights.length.positive?
       fill_color = Colorable::Color.new('#000000')
 
       @lights.each do |light|
@@ -104,10 +98,19 @@ class Scene
         fill_color += light_color * material.color_at(*model.texture_coordinates(hit_point))
       end
 
-      fill_color.hex
+      fill_color
     else
       material.color
     end
+
+    if material.reflectivity.positive?
+      reflection_ray = Ray.new(
+        hit_point + (surface_normal * SHADOW_BIAS),
+        ray.direction - (2.0 * ray.direction.dot(surface_normal) * surface_normal)
+      )
+    end
+
+    color.hex
   end
 
   def closest_intersection_of(ray)
