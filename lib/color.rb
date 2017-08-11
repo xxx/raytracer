@@ -6,7 +6,7 @@ class Color
   def initialize(arg)
     case arg
     when String
-      bytes = [arg.sub('#', '')].pack('H*').split('').map(&:ord)
+      bytes = [arg.sub('#', '')].pack('H*').bytes
       # raise 'Pass an RRGGBB string, like HTML' unless bytes.length == 3
       @red, @green, @blue = bytes
     else
