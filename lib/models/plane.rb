@@ -43,6 +43,6 @@ class Plane
     hit_vec = hit_point - @origin
     x = hit_vec.dot(x_axis)
     y = hit_vec.dot(y_axis)
-    Struct.new(:x, :y).new(x, y)
+    [x, y]
   end
 end

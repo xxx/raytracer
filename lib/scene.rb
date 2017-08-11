@@ -74,13 +74,14 @@ class Scene
               )
 
               # binding.pry
-              fill_color += light_color * closest[0].material.color
+              fill_color += light_color * closest[0].material.color_at(*closest[0].texture_coordinates(hit_point))
             end
 
             draw.fill(fill_color.hex)
           else
             draw.fill(closest[0].material.color)
           end
+
           draw.point(x, y)
         end
 

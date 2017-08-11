@@ -30,12 +30,13 @@ class Sphere
 
     # Now we check a second triangle to get the location of the intersection
     side3 = Math.sqrt(radius2 - opp)
+    # Check both, since the ray might hit in two locations
     t0 = adj - side3
     t1 = adj + side3
 
     return nil if t0.negative? && t1.negative?
 
-    t0 < t1 ? t0 : t1
+    t0 < t1 ? t0 : t1 # lesser == closer
   end
 
   def surface_normal(hit_point)
@@ -44,8 +45,12 @@ class Sphere
 
   def texture_coordinates(hit_point)
     hit_vec = hit_point - @origin
-    x = (1.0 + Math.atan2(hit_vec[2], hit_vec[0]) / Math::PI) * 0.5
-    y = Math.acos(hit_vec[1] - @radius) / Math::PI
-    Struct.new(:x, :y).new(x, y)
+    x = (1.0 + Math.atan2(hit_vec[0], hit_vec[2]) / Math::PI) * 0.5
+    tmp = hit_vec[1] - @radius
+    # Math.acos() pukes for inputs outside of this range. May need to normalize instead.
+    tmp = -1.0 if tmp < -1.0
+    tmp = 1.0 if tmp > 1.0
+    y = Math.acos(tmp) / Math::PI
+    [x, y]
   end
 end
