@@ -35,6 +35,8 @@ class Sphere
     t1 = adj + side3
 
     return nil if t0.negative? && t1.negative?
+    return t0 if t1.negative?
+    return t1 if t0.negative?
 
     t0 < t1 ? t0 : t1 # lesser == closer
   end

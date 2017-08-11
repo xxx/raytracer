@@ -12,8 +12,6 @@ require_relative 'lib/color'
 require_relative 'lib/models/sphere'
 require_relative 'lib/models/plane'
 
-# binding.pry
-
 # Textures can be procs:
 random_color_texture = lambda { |x, y|
   colorz = %w[#00ffff #ff0000 #ffffff #ff00ff #0000ff #00ffff]
@@ -98,8 +96,7 @@ lights = [
     250.0
   )
 ]
-scene = Scene.new(models, width: 500, height: 500, background_color: '#222222', lights: lights)
+scene = Scene.new(models, width: 200, height: 200, background_color: '#222222', lights: lights)
 scene.render(progress_bar: true)
-# binding.pry
 scene.display
 # scene.write('hello.png')

@@ -56,7 +56,7 @@ class Scene
           model, distance = closest
           draw_color = get_color(ray, model, distance)
 
-          draw.fill(draw_color.hex)
+          draw.fill(draw_color.hex_gamma)
           draw.point(x, y)
         end
 
@@ -93,7 +93,6 @@ class Scene
           light.color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min }
         )
 
-        # binding.pry
         fill_color += light_color * material.color_at(*model.texture_coordinates(hit_point))
       end
 

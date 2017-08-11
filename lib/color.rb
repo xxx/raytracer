@@ -1,4 +1,6 @@
 class Color
+  GAMMA = 2.2
+
   attr_reader :red, :green, :blue, :units
 
   def initialize(arg)
@@ -15,6 +17,10 @@ class Color
 
   def rgb
     [@red, @green, @blue]
+  end
+
+  def rgb_gamma
+    @units.map { |c| (c**(1 / GAMMA)) * 255 }
   end
 
   def +(other)
@@ -47,5 +53,9 @@ class Color
 
   def hex(sigil = '#')
     "#{sigil}#{format('%02x%02x%02x', @red, @green, @blue)}"
+  end
+
+  def hex_gamma(sigil = '#')
+    "#{sigil}#{format('%02x%02x%02x', *rgb_gamma)}"
   end
 end
