@@ -66,13 +66,13 @@ class ImageTexture
 end
 
 models = [
-  Sphere.new(Point[-3.0, 1.0, -6.0], 2.0, Material.new('#ffff00', 0.58, checkerboard_texture)),
-  Sphere.new(Point[0.0, 0.0, -5.0], 1.0, Material.new('#77ff77', 0.18)),
-  Sphere.new(Point[2.0, 1.0, -4.0], 1.5, Material.new('#ffa500', 1.0)),
+  Sphere.new(Point[-3.0, 1.0, -6.0], 2.0, Material.new('#ffff00', 0.58, checkerboard_texture, 0.25)),
+  Sphere.new(Point[0.0, 0.0, -5.0], 1.0, Material.new('#ffffff', 0.18, nil, 0.2)),
+  Sphere.new(Point[2.0, 1.0, -4.0], 1.5, Material.new('#ffa500', 1.0, nil, 0.4)),
   Plane.new(
     Point[0.0, -2.0, -5.0],
     Vector[0.0, -1.0, 0.0],
-    Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'))
+    Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'), 0.2)
   ),
   # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], Material.new('#ff0000', 0.38)),
 ]
@@ -98,7 +98,7 @@ lights = [
     250.0
   )
 ]
-scene = Scene.new(models, width: 200, height: 200, background_color: '#222222', lights: lights)
+scene = Scene.new(models, width: 500, height: 500, background_color: '#222222', lights: lights)
 scene.render(progress_bar: true)
 # binding.pry
 scene.display

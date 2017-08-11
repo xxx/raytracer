@@ -38,7 +38,6 @@ class Scene
       )
     end
 
-    # :orthographic vs perspective
     @height.times do |y|
       @width.times do |x|
         # take center of pixel, then normalize to (-1.0..1.0), then adjust for fov
@@ -57,7 +56,7 @@ class Scene
           model, distance = closest
           draw_color = get_color(ray, model, distance)
 
-          draw.fill(draw_color)
+          draw.fill(draw_color.hex)
           draw.point(x, y)
         end
 
@@ -70,7 +69,7 @@ class Scene
 
   private
 
-  def get_color(ray, model, distance)
+  def get_color(ray, model, distance, recursion_depth = 1)
     hit_point = ray.origin + (ray.direction * distance)
 
     material = model.material
@@ -103,14 +102,21 @@ class Scene
       material.color
     end
 
-    if material.reflectivity.positive?
+    if material.reflectivity.positive? && recursion_depth <= MAX_RECURSION_DEPTH
       reflection_ray = Ray.new(
         hit_point + (surface_normal * SHADOW_BIAS),
         ray.direction - (2.0 * ray.direction.dot(surface_normal) * surface_normal)
       )
+
+      reflector = closest_intersection_of(reflection_ray)
+
+      if reflector
+        color *= (1.0 - material.reflectivity)
+        color += get_color(reflection_ray, reflector[0], reflector[1], recursion_depth + 1) * material.reflectivity
+      end
     end
 
-    color.hex
+    color
   end
 
   def closest_intersection_of(ray)
