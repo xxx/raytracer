@@ -8,14 +8,17 @@ require 'matrix'
 
 require_relative 'lib/base'
 require_relative 'lib/scene'
+require_relative 'lib/color'
 require_relative 'lib/models/sphere'
 require_relative 'lib/models/plane'
+
+# binding.pry
 
 # Textures can be procs:
 random_color_texture = lambda { |x, y|
   colorz = %w[#00ffff #ff0000 #ffffff #ff00ff #0000ff #00ffff]
 
-  Colorable::Color.new(colorz.sample)
+  Color.new(colorz.sample)
 }
 
 # Or more complex...
@@ -23,8 +26,8 @@ checkerboard_texture = lambda { |x, y|
   # Generate a 2x2 texture:
   # BW
   # WB
-  black = Colorable::Color.new('#000000')
-  white = Colorable::Color.new('#ffffff')
+  black = Color.new('#000000')
+  white = Color.new('#ffffff')
   width = 2.0 # each color is 1x1
   height = 2.0
 
@@ -58,7 +61,7 @@ class ImageTexture
     r = (pixel.red * 255) / 65535
     g = (pixel.green * 255) / 65535
     b = (pixel.blue * 255) / 65535
-    Colorable::Color.new("##{format('%02x', r)}#{format('%02x', g)}#{format('%02x', b)}")
+    Color.new([r, g, b])
   end
 end
 
@@ -79,11 +82,11 @@ lights = [
   #   '#ffffff',
   #   2.0
   # ),
-  # DirectionalLight.new(
-  #   Vector[1.0, -1.5, -1.0],
-  #   '#ffffff',
-  #   3.0
-  # ),
+  DirectionalLight.new(
+    Vector[1.0, -1.5, -1.0],
+    '#ffffff',
+    3.0
+  ),
   # DirectionalLight.new(
   #   Vector[-0.7, 0.0, -0.2],
   #   '#ffa500',

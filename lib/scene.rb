@@ -77,7 +77,7 @@ class Scene
     surface_normal = model.surface_normal(hit_point)
 
     color = if @lights.length.positive?
-      fill_color = Colorable::Color.new('#000000')
+      fill_color = Color.new('#000000')
 
       @lights.each do |light|
         direction_to_light = light.direction_from(hit_point)
@@ -90,7 +90,7 @@ class Scene
         light_power = surface_normal.dot(direction_to_light) * light_intensity
         light_power = 0.0 if light_power.negative?
         light_reflected = material.albedo / Math::PI
-        light_color = Colorable::Color.new(
+        light_color = Color.new(
           light.color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min }
         )
 

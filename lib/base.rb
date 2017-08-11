@@ -13,7 +13,7 @@ Ray = Struct.new(:origin, :direction)
 Material = Struct.new(:color, :albedo, :texture, :reflectivity) do
   def initialize(*)
     super
-    self.color = Colorable::Color.new(color) if color
+    self.color = Color.new(color) if color
     self.albedo ||= 1.0 # Default to reflecting 100% of light
     self.reflectivity ||= 0.0 # Default to no reflection
   end
@@ -50,7 +50,7 @@ end
 DirectionalLight = Struct.new(:direction, :color, :intensity) do
   def initialize(*)
     super
-    self.color = Colorable::Color.new(color)
+    self.color = Color.new(color)
   end
 
   def direction_from(_hit_point)
@@ -74,7 +74,7 @@ end
 SphericalLight = Struct.new(:position, :color, :intensity) do
   def initialize(*)
     super
-    self.color = Colorable::Color.new(color)
+    self.color = Color.new(color)
   end
 
   def direction_from(hit_point)

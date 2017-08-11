@@ -4,7 +4,6 @@ GEM
     ast (2.3.0)
     byebug (9.0.6)
     coderay (1.1.1)
-    colorable (0.2.0)
     method_source (0.8.2)
     parallel (1.12.0)
     parser (2.4.0.0)
@@ -34,7 +33,6 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
-  colorable
   pry
   rmagick
   rubocop
