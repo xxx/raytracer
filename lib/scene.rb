@@ -72,19 +72,19 @@ class Scene
   def get_color(ray, model, distance, recursion_depth = 1)
     hit_point = ray.origin + (ray.direction * distance)
 
-    material = model.material
     surface_normal = model.surface_normal(hit_point)
 
-    color = diffuse_color(hit_point, model, material, surface_normal)
+    color = diffuse_color(model, hit_point, surface_normal)
 
-    if material.reflectivity.positive? && recursion_depth <= MAX_RECURSION_DEPTH
-      color = reflective_color(color, hit_point, material, surface_normal, ray, recursion_depth)
+    if model.material.reflectivity.positive? && recursion_depth <= MAX_RECURSION_DEPTH
+      color = reflective_color(color, model, hit_point, surface_normal, ray, recursion_depth)
     end
 
     color
   end
 
-  def diffuse_color(hit_point, model, material, surface_normal)
+  def diffuse_color(model, hit_point, surface_normal)
+    material = model.material
     return material.color unless @lights.length.positive?
 
     fill_color = Color.new('#000000')
@@ -110,7 +110,9 @@ class Scene
     fill_color
   end
 
-  def reflective_color(current_color, hit_point, material, surface_normal, ray, recursion_depth)
+  def reflective_color(current_color, model, hit_point, surface_normal, ray, recursion_depth)
+    material = model.material
+
     reflection_ray = Ray.new(
       hit_point + (surface_normal * SHADOW_BIAS),
       ray.direction - (2.0 * ray.direction.dot(surface_normal) * surface_normal)
