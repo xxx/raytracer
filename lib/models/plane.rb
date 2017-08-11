@@ -7,8 +7,7 @@ class Plane
   #
   # @param origin [Point]
   # @param normal [Vector] - assumed to already be normalized
-  # @param material [Material] - Anything that ImageMagick can handle.
-  #   See http://www.simplesystems.org/RMagick/doc/draw.html#fill
+  # @param material [Material]
   # @return [Plane]
   def initialize(origin, normal, material = Material.new('white'))
     @origin = origin

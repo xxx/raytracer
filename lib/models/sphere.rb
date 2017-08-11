@@ -7,8 +7,7 @@ class Sphere
   #
   # @param origin [Point]
   # @param radius [Float]
-  # @param material [Material] - Anything that ImageMagick can handle.
-  #   See http://www.simplesystems.org/RMagick/doc/draw.html#fill
+  # @param material [Material]
   # @return [Sphere]
   def initialize(origin, radius, material = Material.new('white'))
     @origin = origin

@@ -5,7 +5,7 @@ Ray = Struct.new(:origin, :direction)
 
 # Model materials
 #
-# @param [String] color - Any color handled by ImageMagick
+# @param [String] color - hex digits a la HTML
 # @param [Float] albedo - how much ambient light is reflected
 # @param [Proc] texture - proc taking x,y texture coordinates, and returns a color for that pixel from the texture.
 #   Any object responding to #call will work.
@@ -45,7 +45,7 @@ end
 # Directional Light
 #
 # @param [Vector] direction
-# @param [String] color - Any color handled by ImageMagick
+# @param [String] color - hex digits a la HTML
 # @param [Float] intensity - 0.0 (no light) - ~4.0
 DirectionalLight = Struct.new(:direction, :color, :intensity) do
   def initialize(*)
@@ -69,7 +69,7 @@ end
 # Spherical Light
 #
 # @param [Point] position
-# @param [String] color - Any color handled by ImageMagick
+# @param [String] color - hex digits a la HTML
 # @param [Float] intensity - 0.0 (no light) - (anything)
 SphericalLight = Struct.new(:position, :color, :intensity) do
   def initialize(*)
