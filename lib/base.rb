@@ -10,11 +10,12 @@ Ray = Struct.new(:origin, :direction)
 # @param [Proc] texture - proc taking x,y texture coordinates, and returns a color for that pixel from the texture.
 #   Any object responding to #call will work.
 #   Passing a texture will override the color, causing it to be ignored.
-Material = Struct.new(:color, :albedo, :texture) do
+Material = Struct.new(:color, :albedo, :texture, :reflectivity) do
   def initialize(*)
     super
     self.color = Colorable::Color.new(color) if color
     self.albedo ||= 1.0 # Default to reflecting 100% of light
+    self.reflectivity ||= 0.0 # Default to no reflection
   end
 
   def color_at(x, y)

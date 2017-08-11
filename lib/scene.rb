@@ -2,6 +2,7 @@
 
 class Scene
   SHADOW_BIAS = 1e-13
+  MAX_RECURSION_DEPTH = 10
 
   extend Forwardable
   def_delegators :@canvas, :display, :write
@@ -53,6 +54,9 @@ class Scene
         closest = closest_intersection_of(ray)
 
         if closest
+          draw_color = nil
+          material = closest[0].material
+
           if @lights.length.positive?
             hit_point = ray.origin + (ray.direction * closest[1])
             surface_normal = closest[0].surface_normal(hit_point)
@@ -68,20 +72,25 @@ class Scene
               light_intensity = lit ? light.intensity_at(hit_point) : 0.0
               light_power = surface_normal.dot(direction_to_light) * light_intensity
               light_power = 0.0 if light_power.negative?
-              light_reflected = closest[0].material.albedo / Math::PI
+              light_reflected = material.albedo / Math::PI
               light_color = Colorable::Color.new(
                 light.color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min }
               )
 
               # binding.pry
-              fill_color += light_color * closest[0].material.color_at(*closest[0].texture_coordinates(hit_point))
+              fill_color += light_color * material.color_at(*closest[0].texture_coordinates(hit_point))
             end
 
-            draw.fill(fill_color.hex)
+            draw_color = fill_color.hex
           else
-            draw.fill(closest[0].material.color)
+            draw_color = material.color
           end
 
+          if material.reflectivity.positive?
+
+          end
+
+          draw.fill(draw_color)
           draw.point(x, y)
         end
 
@@ -102,19 +111,5 @@ class Scene
     end.sort_by do |x|
       x[1]
     end.first
-  end
-
-  def multiply_colors(color1, color2)
-    bytes1 = [color1.sub('#', '')].pack('H*').bytes
-    bytes2 = [color2.sub('#', '')].pack('H*').bytes
-    normalized1 = bytes1.map { |byte| byte / 255.0 }
-    normalized2 = bytes2.map { |byte| byte / 255.0 }
-    multiplied = normalized1.each_with_index.with_object([]) do |(byte, idx), ob|
-      ob.push byte * normalized2[idx]
-    end
-
-    denormalized = multiplied.map { |m| m * 255.0 }
-    bytes3 = denormalized.pack('C*')
-
   end
 end
