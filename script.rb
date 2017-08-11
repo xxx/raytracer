@@ -64,13 +64,13 @@ class ImageTexture
 end
 
 models = [
-  Sphere.new(Point[-3.0, 1.0, -6.0], 2.0, Material.new('#ffff00', 0.58, checkerboard_texture, 0.25)),
-  Sphere.new(Point[0.0, 0.0, -5.0], 1.0, Material.new('#ffffff', 0.18, nil, 0.2)),
-  Sphere.new(Point[2.0, 1.0, -4.0], 1.5, Material.new('#ffa500', 1.0, nil, 0.4)),
+  Sphere.new(Point[-3.0, 1.0, -6.0], 2.0, Material.new('#ffff00', 0.58, checkerboard_texture, 0.1)),
+  Sphere.new(Point[0.0, 0.0, -5.0], 1.0, Material.new('#ff00ff', 0.18, nil, 0.2)),
+  Sphere.new(Point[2.0, 1.0, -4.0], 1.5, Material.new('#ffa500', 1.0, nil, 0.05)),
   Plane.new(
     Point[0.0, -2.0, -5.0],
     Vector[0.0, -1.0, 0.0],
-    Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'), 0.2)
+    Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'))
   ),
   # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], Material.new('#ff0000', 0.38)),
 ]
@@ -83,7 +83,7 @@ lights = [
   DirectionalLight.new(
     Vector[1.0, -1.5, -1.0],
     '#ffffff',
-    3.0
+    1.0
   ),
   # DirectionalLight.new(
   #   Vector[-0.7, 0.0, -0.2],
@@ -93,7 +93,7 @@ lights = [
   SphericalLight.new(
     Point[0.25, 0.0, -2.0],
     '#ffffff',
-    250.0
+    200.0
   )
 ]
 scene = Scene.new(models, width: 200, height: 200, background_color: '#222222', lights: lights)

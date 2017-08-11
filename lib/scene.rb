@@ -75,47 +75,54 @@ class Scene
     material = model.material
     surface_normal = model.surface_normal(hit_point)
 
-    color = if @lights.length.positive?
-      fill_color = Color.new('#000000')
-
-      @lights.each do |light|
-        direction_to_light = light.direction_from(hit_point)
-        # use SHADOW_BIAS to correct shadow acne. can lead to peter panning, but better that than acne
-        shadow_ray = Ray.new(hit_point + (surface_normal * SHADOW_BIAS), direction_to_light.normalize)
-        shadow_intersection = closest_intersection_of(shadow_ray)
-
-        lit = shadow_intersection.nil? || shadow_intersection[1] > light.distance_from(hit_point)
-        light_intensity = lit ? light.intensity_at(hit_point) : 0.0
-        light_power = surface_normal.dot(direction_to_light) * light_intensity
-        light_power = 0.0 if light_power.negative?
-        light_reflected = material.albedo / Math::PI
-        light_color = Color.new(
-          light.color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min }
-        )
-
-        fill_color += light_color * material.color_at(*model.texture_coordinates(hit_point))
-      end
-
-      fill_color
-    else
-      material.color
-    end
+    color = diffuse_color(hit_point, model, material, surface_normal)
 
     if material.reflectivity.positive? && recursion_depth <= MAX_RECURSION_DEPTH
-      reflection_ray = Ray.new(
-        hit_point + (surface_normal * SHADOW_BIAS),
-        ray.direction - (2.0 * ray.direction.dot(surface_normal) * surface_normal)
-      )
-
-      reflector = closest_intersection_of(reflection_ray)
-
-      if reflector
-        color *= (1.0 - material.reflectivity)
-        color += get_color(reflection_ray, reflector[0], reflector[1], recursion_depth + 1) * material.reflectivity
-      end
+      color = reflective_color(color, hit_point, material, surface_normal, ray, recursion_depth)
     end
 
     color
+  end
+
+  def diffuse_color(hit_point, model, material, surface_normal)
+    return material.color unless @lights.length.positive?
+
+    fill_color = Color.new('#000000')
+
+    @lights.each do |light|
+      direction_to_light = light.direction_from(hit_point)
+      # use SHADOW_BIAS to correct shadow acne. can lead to peter panning, but better that than acne
+      shadow_ray = Ray.new(hit_point + (surface_normal * SHADOW_BIAS), direction_to_light.normalize)
+      shadow_intersection = closest_intersection_of(shadow_ray)
+
+      lit = shadow_intersection.nil? || shadow_intersection[1] > light.distance_from(hit_point)
+      light_intensity = lit ? light.intensity_at(hit_point) : 0.0
+      light_power = surface_normal.dot(direction_to_light) * light_intensity
+      light_power = 0.0 if light_power.negative?
+      light_reflected = material.albedo / Math::PI
+      light_color = Color.new(
+        light.color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min }
+      )
+
+      fill_color += light_color * material.color_at(*model.texture_coordinates(hit_point))
+    end
+
+    fill_color
+  end
+
+  def reflective_color(current_color, hit_point, material, surface_normal, ray, recursion_depth)
+    reflection_ray = Ray.new(
+      hit_point + (surface_normal * SHADOW_BIAS),
+      ray.direction - (2.0 * ray.direction.dot(surface_normal) * surface_normal)
+    )
+
+    reflector = closest_intersection_of(reflection_ray)
+
+    if reflector
+      current_color *= (1.0 - material.reflectivity)
+      current_color += get_color(reflection_ray, reflector[0], reflector[1], recursion_depth + 1) * material.reflectivity
+    end
+    current_color
   end
 
   def closest_intersection_of(ray)
