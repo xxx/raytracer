@@ -9,6 +9,7 @@ require 'matrix'
 require_relative 'lib/base'
 require_relative 'lib/scene'
 require_relative 'lib/color'
+require_relative 'lib/material'
 require_relative 'lib/models/shape'
 require_relative 'lib/models/sphere'
 require_relative 'lib/models/plane'
@@ -52,7 +53,7 @@ class ImageTexture
   def call(x, y)
     xt, yt = Material.to_absolute_coordinates(x, y, @width, @height)
 
-    # Subject xt and yt from the width and height to flip the image
+    # Subtract xt and yt from the width and height to flip the image
     pixel = @img_data.pixel_color(@width - xt, @height - yt)
 
     # assume 16 bit quantum depth here, since that seems to be common.
@@ -65,20 +66,27 @@ class ImageTexture
 end
 
 models = [
-  Sphere.new(Point[0.0, 0.0, -5.0], 1.0, Material.new('#33ff33', 0.18, nil, 0.7)),
-  Sphere.new(Point[-3.0, 1.0, -6.0], 2.0, Material.new('#ff00ff', 0.58, checkerboard_texture)),
-  Sphere.new(Point[2.0, 1.0, -4.0], 1.5, Material.new('#ffffff', 0.18, nil, 0.0, Struct.new(:index, :transparency).new(1.5, 1.0))),
+  Sphere.new(Point[0.0, 0.0, -5.0], 1.0, Material.new(color: '#33ff33', albedo: 0.18, reflectivity: 0.7)),
+  Sphere.new(Point[-3.0, 1.0, -6.0], 2.0, Material.new(albedo: 0.58, texture: checkerboard_texture)),
+  Sphere.new(
+    Point[2.0, 1.0, -4.0],
+    1.5,
+    Material.new(
+      color: '#ffffff',
+      albedo: 0.18,
+      refraction: Struct.new(:index, :transparency).new(1.5, 1.0)
+    )
+  ),
   Plane.new(
     Point[0.0, -2.0, -5.0],
     Vector[0.0, -1.0, 0.0],
-    # Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'))
-    Material.new('#ffffff', 0.18, checkerboard_texture, 0.5)
+    Material.new(albedo: 0.18, texture: checkerboard_texture, reflectivity: 0.5)
   ),
   Plane.new(
     Point[0.0, 0.0, -20.0],
     Vector[0.0, 0.0, -1.0],
-    # Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'))
-    Material.new('#4455ff', 0.38)
+    # Material.new(albedo: 0.6, texture: ImageTexture.new('img/ostrich.jpg'))
+    Material.new(color: '#4455ff', albedo: 0.38)
   )
 ]
 
@@ -109,7 +117,8 @@ lights = [
     250.0
   )
 ]
-scene = Scene.new(models, width: 500, height: 500, background_color: '#222222', lights: lights)
+
+scene = Scene.new(models, width: 200, height: 200, background_color: '#222222', lights: lights)
 scene.render(progress_bar: true)
 scene.display
 # scene.write('hello.png')

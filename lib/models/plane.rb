@@ -13,7 +13,7 @@ class Plane
   # @param normal [Vector] - assumed to already be normalized
   # @param material [Material]
   # @return [Plane]
-  def initialize(origin, normal, material = Material.new('white'))
+  def initialize(origin, normal, material = Material.new)
     @origin = origin
     @normal = normal
     @material = material

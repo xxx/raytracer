@@ -13,7 +13,7 @@ class Sphere
   # @param radius [Float]
   # @param material [Material]
   # @return [Sphere]
-  def initialize(origin, radius, material = Material.new('white'))
+  def initialize(origin, radius, material = Material.new)
     @origin = origin
     @radius = radius
     @material = material
