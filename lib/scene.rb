@@ -83,14 +83,15 @@ class Scene
 
     surface_normal = model.surface_normal(hit_point)
 
-    if !model.material.reflectivity.positive? && model.material.refraction.nil?
+    case model.material.type
+    when :diffuse
       diffuse_color(model, hit_point, surface_normal)
-    elsif model.material.refraction
-      color = model.base_color_at(hit_point)
-      refractive_color(color, model, hit_point, surface_normal, ray, recursion_depth) || black
-    else # reflective
+    when :reflective
       color = diffuse_color(model, hit_point, surface_normal)
       reflective_color(color, model, hit_point, surface_normal, ray, recursion_depth) || black
+    when :refractive
+      color = model.base_color_at(hit_point)
+      refractive_color(color, model, hit_point, surface_normal, ray, recursion_depth) || black
     end
   end
 

@@ -20,6 +20,16 @@ class Material
     @refraction = refraction
   end
 
+  def type
+    if @refraction
+      :refractive
+    elsif @reflectivity.positive?
+      :reflective
+    else
+      :diffuse
+    end
+  end
+
   def color_at(x, y)
     if texture
       texture.call(x, y)
