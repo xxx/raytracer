@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Model materials
 class Material
   attr_reader :color, :albedo, :texture, :reflectivity, :refraction

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# Shout out to https://bheisler.github.io/post/writing-raytracer-in-rust-part-1/, from which I cribbed a bunch of code.
-
 require 'bundler'
 Bundler.require
 require 'matrix'
@@ -109,7 +107,7 @@ lights = [
   SphericalLight.new(
     Point[-2.0, 10.0, -3.0],
     '#33aa33',
-    10000.0
+    10_000.0
   ),
   SphericalLight.new(
     Point[0.25, 0.0, -2.0],

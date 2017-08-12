@@ -56,14 +56,13 @@ class Scene
 
         closest = closest_intersection_of(ray)
 
-        if closest
-          model, distance = closest
-          draw_color = get_color(ray, model, distance)
+        next unless closest
+        model, distance = closest
+        draw_color = get_color(ray, model, distance)
 
-          @draw_mutex.synchronize do
-            draw.fill(draw_color.hex_gamma)
-            draw.point(x, y)
-          end
+        @draw_mutex.synchronize do
+          draw.fill(draw_color.hex_gamma)
+          draw.point(x, y)
         end
       end
 

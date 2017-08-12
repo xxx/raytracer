@@ -2,8 +2,8 @@
 
 source 'https://rubygems.org'
 
-gem 'rmagick'
 gem 'parallel'
+gem 'rmagick'
 
 gem 'byebug'
 gem 'pry'
