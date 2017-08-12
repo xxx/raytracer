@@ -18,3 +18,5 @@ the size of the output image). This drawing step is handled by ImageMagick.
 `script.rb` has examples of image-based and programmatic textures, and changing
 to save the rendered image to a file instead of displaying it is a one line
 change to call `.write(filename)` rather than `display`.
+
+http://i.imgur.com/YQpHy0e.png is an example render from this tracer.
