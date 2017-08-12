@@ -70,6 +70,7 @@ class Scene
       bar.progress += @width if bar
     end
 
+    # this is typically the slowest part of the entire render for larger images
     draw.draw(@canvas)
   end
 
@@ -84,13 +85,13 @@ class Scene
     surface_normal = model.surface_normal(hit_point)
 
     if !model.material.reflectivity.positive? && model.material.refraction.nil?
-      return diffuse_color(model, hit_point, surface_normal)
+      diffuse_color(model, hit_point, surface_normal)
     elsif model.material.refraction
       color = model.base_color_at(hit_point)
-      return refractive_color(color, model, hit_point, surface_normal, ray, recursion_depth) || black
-    else
+      refractive_color(color, model, hit_point, surface_normal, ray, recursion_depth) || black
+    else # reflective
       color = diffuse_color(model, hit_point, surface_normal)
-      return reflective_color(color, model, hit_point, surface_normal, ray, recursion_depth) || black
+      reflective_color(color, model, hit_point, surface_normal, ray, recursion_depth) || black
     end
   end
 
@@ -131,18 +132,19 @@ class Scene
       ray.direction - (2.0 * ray.direction.dot(surface_normal) * surface_normal)
     )
 
-    reflector = closest_intersection_of(reflection_ray)
+    reflected = closest_intersection_of(reflection_ray)
 
-    if reflector
+    if reflected
       current_color *= (1.0 - material.reflectivity)
-      current_color += get_color(reflection_ray, reflector[0], reflector[1], recursion_depth + 1) * material.reflectivity
+      current_color +=
+        get_color(reflection_ray, reflected[0], reflected[1], recursion_depth + 1) * material.reflectivity
     end
     current_color
   end
 
   def refractive_color(current_color, model, hit_point, surface_normal, ray, recursion_depth)
-    refraction_color = Color.new('#ffffff')
-    reflection_color = Color.new('#ffffff')
+    refraction_color = Color.new('#000000')
+    reflection_color = Color.new('#000000')
 
     material = model.material
     index_of_refraction = material.refraction.index

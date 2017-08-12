@@ -109,7 +109,7 @@ lights = [
     250.0
   )
 ]
-scene = Scene.new(models, width: 200, height: 200, background_color: '#222222', lights: lights)
+scene = Scene.new(models, width: 500, height: 500, background_color: '#222222', lights: lights)
 scene.render(progress_bar: true)
 scene.display
 # scene.write('hello.png')
