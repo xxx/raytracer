@@ -13,7 +13,7 @@ require_relative 'lib/models/sphere'
 require_relative 'lib/models/plane'
 
 # Textures can be procs:
-random_color_texture = lambda { |x, y|
+random_color_texture = lambda { |_x, _y|
   colorz = %w[#00ffff #ff0000 #ffffff #ff00ff #0000ff #00ffff]
 
   Color.new(colorz.sample)
@@ -56,9 +56,9 @@ class ImageTexture
 
     # assume 16 bit quantum depth here, since that seems to be common.
     # Normalize down to 0-255 8 bit range
-    r = (pixel.red * 255) / 65535
-    g = (pixel.green * 255) / 65535
-    b = (pixel.blue * 255) / 65535
+    r = (pixel.red * 255) / 65_535
+    g = (pixel.green * 255) / 65_535
+    b = (pixel.blue * 255) / 65_535
     Color.new([r, g, b])
   end
 end
@@ -66,7 +66,7 @@ end
 models = [
   Sphere.new(Point[-3.0, 1.0, -6.0], 2.0, Material.new('#ffff00', 0.58, checkerboard_texture, 0.1)),
   Sphere.new(Point[0.0, 0.0, -5.0], 1.0, Material.new('#ff00ff', 0.18, nil, 0.2)),
-  Sphere.new(Point[2.0, 1.0, -4.0], 1.5, Material.new('#ffa500', 1.0, nil, 0.05)),
+  Sphere.new(Point[2.0, 1.0, -4.0], 1.5, Material.new('#ffffff', 0.3, nil, 0.0, Struct.new(:index, :transparency).new(1.5, 1.0))),
   Plane.new(
     Point[0.0, -2.0, -5.0],
     Vector[0.0, -1.0, 0.0],

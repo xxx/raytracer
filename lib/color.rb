@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Color
   GAMMA = 2.2
 
@@ -25,13 +27,13 @@ class Color
 
   def +(other)
     added = case other
-    when Float
-      @units.map { |unit| [unit + other, 1.0].min }
-    when Color
-      other_units = other.units
-      @units.map.with_index { |unit, idx| [unit + other_units[idx], 1.0].min }
-    else
-      raise 'what are you giving me here?'
+            when Float
+              @units.map { |unit| [unit + other, 1.0].min }
+            when Color
+              other_units = other.units
+              @units.map.with_index { |unit, idx| [unit + other_units[idx], 1.0].min }
+            else
+              raise 'what are you giving me here?'
     end
 
     Color.new(added.map { |a| (a * 255).to_i })
@@ -39,13 +41,13 @@ class Color
 
   def *(other)
     added = case other
-    when Float
-      @units.map { |unit| [unit * other, 1.0].min }
-    when Color
-      other_units = other.units
-      @units.map.with_index { |unit, idx| [unit * other_units[idx], 1.0].min }
-    else
-      raise 'what are you giving me here?'
+            when Float
+              @units.map { |unit| [unit * other, 1.0].min }
+            when Color
+              other_units = other.units
+              @units.map.with_index { |unit, idx| [unit * other_units[idx], 1.0].min }
+            else
+              raise 'what are you giving me here?'
     end
 
     Color.new(added.map { |a| (a * 255).to_i })

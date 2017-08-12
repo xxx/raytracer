@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # For readability
 Point = Vector
 
@@ -10,7 +12,9 @@ Ray = Struct.new(:origin, :direction)
 # @param [Proc] texture - proc taking x,y texture coordinates, and returns a color for that pixel from the texture.
 #   Any object responding to #call will work.
 #   Passing a texture will override the color, causing it to be ignored.
-Material = Struct.new(:color, :albedo, :texture, :reflectivity) do
+# @param [Float] reflectivity - range 0.0 (no reflection) - 1.0 (full mirror)
+# @param [Struct] refraction - Struct with members named index and transparency
+Material = Struct.new(:color, :albedo, :texture, :reflectivity, :refraction) do
   def initialize(*)
     super
     self.color = Color.new(color) if color
