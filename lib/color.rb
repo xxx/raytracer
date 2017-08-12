@@ -8,11 +8,11 @@ class Color
   def initialize(arg)
     case arg
     when String
-      bytes = [arg.sub('#', '')].pack('H*').bytes
+      bytes = [arg.tr('#', '')].pack('H*').bytes
       # raise 'Pass an RRGGBB string, like HTML' unless bytes.length == 3
       @red, @green, @blue = bytes
     else
-      @red, @green, @blue = arg
+      @red, @green, @blue = arg[0..2]
     end
     @units = [@red / 255.0, @green / 255.0, @blue / 255.0]
   end
