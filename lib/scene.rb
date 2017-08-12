@@ -92,8 +92,10 @@ class Scene
   end
 
   def diffuse_color(model, hit_point, surface_normal)
+    model_color = model.base_color_at(hit_point)
+    return model_color unless @lights.length.positive?
+
     material = model.material
-    return material.color unless @lights.length.positive?
 
     fill_color = Color.new('#000000')
 
@@ -112,7 +114,7 @@ class Scene
         light.color.rgb.map { |c| [(c * light_power * light_reflected).to_i, 255].min }
       )
 
-      fill_color += light_color * material.color_at(*model.texture_coordinates(hit_point))
+      fill_color += light_color * model_color
     end
 
     fill_color

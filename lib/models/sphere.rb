@@ -3,6 +3,8 @@
 # Sphere model
 
 class Sphere
+  include Shape
+
   attr_reader :origin, :radius, :material
 
   # Create a sphere

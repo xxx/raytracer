@@ -9,6 +9,7 @@ require 'matrix'
 require_relative 'lib/base'
 require_relative 'lib/scene'
 require_relative 'lib/color'
+require_relative 'lib/models/shape'
 require_relative 'lib/models/sphere'
 require_relative 'lib/models/plane'
 

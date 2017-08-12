@@ -3,6 +3,8 @@
 # Plane model
 
 class Plane
+  include Shape
+
   attr_reader :origin, :normal, :material
 
   # Create a plane
