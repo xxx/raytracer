@@ -33,6 +33,7 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
+  parallel
   pry
   rmagick
   rubocop

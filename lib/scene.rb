@@ -27,6 +27,8 @@ class Scene
       img.background_color = background_color
     end
     @lights = lights
+
+    @draw_mutex = Mutex.new
   end
 
   def render(progress_bar: false)
@@ -41,7 +43,7 @@ class Scene
     end
 
     @height.times do |y|
-      @width.times do |x|
+      Parallel.each(0...@width, in_threads: 4) do |x|
         # take center of pixel, then normalize to (-1.0..1.0), then adjust for fov
         ray_x = (((x + 0.5) / @width) * 2.0 - 1.0) * @fov_adjustment
         ray_y = (1.0 - ((y + 0.5) / @height) * 2.0) * @fov_adjustment
@@ -58,12 +60,14 @@ class Scene
           model, distance = closest
           draw_color = get_color(ray, model, distance)
 
-          draw.fill(draw_color.hex_gamma)
-          draw.point(x, y)
+          @draw_mutex.synchronize do
+            draw.fill(draw_color.hex_gamma)
+            draw.point(x, y)
+          end
         end
-
-        bar&.increment
       end
+
+      bar.progress += @width if bar
     end
 
     draw.draw(@canvas)
