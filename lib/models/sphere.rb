@@ -17,6 +17,8 @@ class Sphere
     @origin = origin
     @radius = radius
     @material = material
+
+    freeze
   end
 
   # Where do I intersect with the given ray?

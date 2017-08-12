@@ -17,6 +17,8 @@ class Plane
     @origin = origin
     @normal = normal
     @material = material
+
+    freeze
   end
 
   # Where do I intersect with the given ray?

@@ -14,6 +14,8 @@ DirectionalLight = Struct.new(:direction, :color, :intensity) do
   def initialize(*)
     super
     self.color = Color.new(color)
+
+    freeze
   end
 
   def direction_from(_hit_point)
@@ -38,6 +40,8 @@ SphericalLight = Struct.new(:position, :color, :intensity) do
   def initialize(*)
     super
     self.color = Color.new(color)
+
+    freeze
   end
 
   def direction_from(hit_point)

@@ -29,6 +29,8 @@ class Scene
     @lights = lights
 
     @draw_mutex = Mutex.new
+
+    freeze
   end
 
   def render(progress_bar: false)

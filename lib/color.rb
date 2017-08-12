@@ -15,6 +15,8 @@ class Color
       @red, @green, @blue = arg[0..2]
     end
     @units = [@red / 255.0, @green / 255.0, @blue / 255.0]
+
+    freeze
   end
 
   def rgb

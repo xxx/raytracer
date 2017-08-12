@@ -18,6 +18,8 @@ class Material
     @texture = texture
     @reflectivity = reflectivity
     @refraction = refraction
+
+    freeze
   end
 
   def type
