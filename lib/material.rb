@@ -11,7 +11,6 @@ class Material
   #   Passing a texture will override the color, causing it to be ignored.
   # @param [Float] reflectivity - range 0.0 (no reflection) - 1.0 (full mirror)
   # @param [Struct] refraction - Struct with members named index and transparency
-  # Material = Struct.new(:color, :albedo, :texture, :reflectivity, :refraction) do
   def initialize(color: '#ffffff', albedo: 1.0, texture: nil, reflectivity: 0.0, refraction: nil)
     @color = Color.new(color)
     @albedo = albedo
