@@ -72,23 +72,22 @@ class Scene
   private
 
   def get_color(ray, model, distance, recursion_depth = 1)
-    return Color.new('#000000') if recursion_depth > MAX_RECURSION_DEPTH
+    black = Color.new('#000000')
+    return black if recursion_depth > MAX_RECURSION_DEPTH
 
     hit_point = ray.origin + (ray.direction * distance)
 
     surface_normal = model.surface_normal(hit_point)
 
-    color = diffuse_color(model, hit_point, surface_normal)
-
-    if model.material.reflectivity.positive?
-      color = reflective_color(color, model, hit_point, surface_normal, ray, recursion_depth)
+    if !model.material.reflectivity.positive? && model.material.refraction.nil?
+      return diffuse_color(model, hit_point, surface_normal)
+    elsif model.material.refraction
+      color = model.base_color_at(hit_point)
+      return refractive_color(color, model, hit_point, surface_normal, ray, recursion_depth) || black
+    else
+      color = diffuse_color(model, hit_point, surface_normal)
+      return reflective_color(color, model, hit_point, surface_normal, ray, recursion_depth) || black
     end
-
-    if model.material.refraction
-      color = refractive_color(color, model, hit_point, surface_normal, ray, recursion_depth)
-    end
-
-    color
   end
 
   def diffuse_color(model, hit_point, surface_normal)
@@ -138,13 +137,12 @@ class Scene
   end
 
   def refractive_color(current_color, model, hit_point, surface_normal, ray, recursion_depth)
-    refraction_color = nil
+    refraction_color = Color.new('#ffffff')
+    reflection_color = Color.new('#ffffff')
 
-    current_color = Color.new('#000000')
     material = model.material
     index_of_refraction = material.refraction.index
     kr = fresnel(ray.direction, surface_normal, index_of_refraction)
-    # kr = 0.7
 
     if kr < 1.0
       ref_n = surface_normal
@@ -178,8 +176,18 @@ class Scene
         end
       end
 
-      current_color *= refraction_color if refraction_color
-      current_color * material.refraction.transparency
+      reflection_ray = Ray.new(
+        hit_point + (surface_normal * SHADOW_BIAS),
+        ray.direction - (2.0 * ray.direction.dot(surface_normal) * surface_normal)
+      )
+
+      reflector = closest_intersection_of(reflection_ray)
+      if reflector
+        reflection_color = get_color(reflection_ray, reflector[0], reflector[1], recursion_depth + 1)
+      end
+
+      c = reflection_color * kr + refraction_color * (1.0 - kr) * material.refraction.transparency
+      current_color * c
     end
   end
 

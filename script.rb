@@ -65,16 +65,23 @@ class ImageTexture
 end
 
 models = [
-  Sphere.new(Point[-3.0, 1.0, -6.0], 2.0, Material.new('#ffff00', 0.58, checkerboard_texture, 0.1)),
-  Sphere.new(Point[0.0, 0.0, -5.0], 1.0, Material.new('#ff00ff', 0.18, nil, 0.2)),
-  Sphere.new(Point[2.0, 1.0, -4.0], 1.5, Material.new('#ffffff', 0.3, nil, 0.0, Struct.new(:index, :transparency).new(1.5, 1.0))),
+  Sphere.new(Point[0.0, 0.0, -5.0], 1.0, Material.new('#33ff33', 0.18, nil, 0.7)),
+  Sphere.new(Point[-3.0, 1.0, -6.0], 2.0, Material.new('#ff00ff', 0.58, checkerboard_texture)),
+  Sphere.new(Point[2.0, 1.0, -4.0], 1.5, Material.new('#ffffff', 0.18, nil, 0.0, Struct.new(:index, :transparency).new(1.5, 1.0))),
   Plane.new(
     Point[0.0, -2.0, -5.0],
     Vector[0.0, -1.0, 0.0],
-    Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'))
+    # Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'))
+    Material.new('#ffffff', 0.18, checkerboard_texture, 0.5)
   ),
-  # Plane.new(Point[0.0, 0.0, -20.0], Vector[0.0, 0.0, -1.0], Material.new('#ff0000', 0.38)),
+  Plane.new(
+    Point[0.0, 0.0, -20.0],
+    Vector[0.0, 0.0, -1.0],
+    # Material.new('#ffffff', 0.6, ImageTexture.new('img/ostrich.jpg'))
+    Material.new('#4455ff', 0.38)
+  )
 ]
+
 lights = [
   # DirectionalLight.new(
   #   Vector[0.0, 0.0, -1.0],
@@ -82,9 +89,9 @@ lights = [
   #   2.0
   # ),
   DirectionalLight.new(
-    Vector[1.0, -1.5, -1.0],
+    Vector[0.0, 0.0, -1.0],
     '#ffffff',
-    1.0
+    0.0
   ),
   # DirectionalLight.new(
   #   Vector[-0.7, 0.0, -0.2],
@@ -92,9 +99,14 @@ lights = [
   #   4.0
   # ),
   SphericalLight.new(
+    Point[-2.0, 10.0, -3.0],
+    '#33aa33',
+    10000.0
+  ),
+  SphericalLight.new(
     Point[0.25, 0.0, -2.0],
-    '#ffffff',
-    200.0
+    '#aa3333',
+    250.0
   )
 ]
 scene = Scene.new(models, width: 200, height: 200, background_color: '#222222', lights: lights)
